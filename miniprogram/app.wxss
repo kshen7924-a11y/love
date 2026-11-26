@@ -1,0 +1,98 @@
+page {
+  background-color: #F7F8FA;
+  color: #1F2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+view, text, button, image {
+  box-sizing: border-box;
+}
+
+.container {
+  padding: 28rpx 32rpx 80rpx;
+  padding-bottom: calc(80rpx + env(safe-area-inset-bottom));
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.04);
+  border: 1rpx solid #EEF1F5;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-outline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  padding: 0 28rpx;
+  border-radius: 999rpx;
+  font-weight: 700;
+  font-size: 30rpx;
+  text-align: center;
+}
+
+.btn-primary,
+.btn-secondary {
+  height: 96rpx;
+  line-height: 96rpx;
+}
+
+.btn-outline {
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 29rpx;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #33A474;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-secondary {
+  background: #4298B4;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-outline {
+  background: #FFFFFF;
+  color: #374151;
+  border: 2rpx solid #D1D5DB;
+}
+
+.btn-primary::after,
+.btn-secondary::after,
+.btn-outline::after {
+  border: none;
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-outline:active {
+  opacity: 0.86;
+  transform: scale(0.985);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 16rpx;
+}
+
+.muted-note {
+  font-size: 22rpx;
+  color: #9CA3AF;
+  line-height: 1.55;
+}

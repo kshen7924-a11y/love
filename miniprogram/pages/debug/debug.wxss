@@ -1,0 +1,62 @@
+.debug-card {
+  padding: 36rpx 32rpx;
+}
+
+.debug-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 6rpx;
+}
+
+.debug-sub {
+  font-size: 22rpx;
+  color: #9CA3AF;
+  margin-bottom: 24rpx;
+}
+
+.env-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 25rpx;
+  color: #6B7280;
+  padding: 10rpx 0;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.env-val {
+  font-weight: 700;
+  color: #1F2937;
+  max-width: 420rpx;
+  text-align: right;
+}
+
+.env-id {
+  font-size: 22rpx;
+  word-break: break-all;
+}
+
+.debug-btn {
+  margin-top: 20rpx;
+}
+
+.log-title {
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #374151;
+  margin: 28rpx 0 12rpx;
+}
+
+.log-box {
+  background: #F8FAFC;
+  border-radius: 16rpx;
+  padding: 18rpx 20rpx;
+}
+
+.log-line {
+  font-size: 22rpx;
+  color: #4B5563;
+  line-height: 1.6;
+  word-break: break-all;
+}

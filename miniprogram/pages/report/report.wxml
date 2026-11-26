@@ -1,0 +1,162 @@
+<view wx:if="{{report}}" class="container">
+  <!-- 海报级顶部首屏：黑字称号 -> 翠绿代码 -> 居中插画 -> 黑字一句话总结 -->
+  <view class="card poster-hero">
+    <view class="poster-group">{{report.group}}{{report.isPreview ? ' · 恋爱预演参考' : ''}}</view>
+    <view class="poster-title">{{report.title}}</view>
+    <view class="poster-code">{{report.code}}</view>
+
+    <view class="poster-art-wrap">
+      <image
+        wx:if="{{!artLoadError}}"
+        class="poster-art"
+        src="{{characterImg}}"
+        mode="aspectFit"
+        binderror="onArtError"
+      />
+      <view wx:else class="art-placeholder" style="{{'border-color:' + report.color + ';'}}">
+        <text class="art-placeholder-code" style="{{'color:' + report.color + ';'}}">{{report.code}}</text>
+        <text class="art-placeholder-tip">待放入 {{characterImg}}</text>
+      </view>
+    </view>
+
+    <view class="poster-oneliner">{{report.oneLiner}}</view>
+  </view>
+
+  <!-- 模块 ①：人格特征（四维滑轨 + 八维特质曲线 + 四维文字解读） -->
+  <view class="card">
+    <view class="section-title">① 人格特征</view>
+    <view class="trait-intro">{{report.traitIntro}}</view>
+
+    <!-- 四维行为倾向滑轨 -->
+    <view class="sub-block-title">四维行为倾向</view>
+    <view wx:for="{{report.axisSummary}}" wx:key="key" class="axis-row">
+      <view class="axis-labels">
+        <text class="axis-end {{item.letter === item.posCode ? 'axis-active' : ''}}">{{item.posCode}} · {{item.posLabel}}</text>
+        <text class="axis-pct">{{item.split ? '双方有温差' : item.pct + '%'}}</text>
+        <text class="axis-end {{item.letter === item.negCode ? 'axis-active' : ''}}">{{item.negLabel}} · {{item.negCode}}</text>
+      </view>
+      <view class="slider-track">
+        <view
+          wx:if="{{!item.split}}"
+          class="slider-bar"
+          style="{{'width:' + item.pct + '%; background:' + item.color + ';'}}"
+        ></view>
+        <view wx:else class="slider-split"></view>
+      </view>
+    </view>
+
+    <!-- 八维细分特质雷达 -->
+    <view class="sub-block-title curve-gap">八维特质雷达</view>
+    <view class="radar-intro">
+      同色两项属于同一主维度，越靠外表示该项越突出。双人结果中标注「有温差」的项，说明双方在这一维度分歧较大。
+    </view>
+    <view class="radar-wrap">
+      <canvas canvas-id="subRadar" class="radar-canvas"></canvas>
+    </view>
+    <view class="radar-legend">
+      <view wx:for="{{radarLegend}}" wx:key="key" class="legend-item">
+        <view class="legend-dot" style="{{'background:' + item.color + ';'}}"></view>
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+    <view class="radar-values">
+      <view wx:for="{{report.subTraits}}" wx:key="name" class="radar-value-item">
+        <text class="radar-value-name">{{item.shortName}}</text>
+        <text class="radar-value-score" style="{{'color:' + item.color + ';'}}">{{item.split ? '有温差' : item.score + '%'}}</text>
+      </view>
+    </view>
+
+    <!-- 四维文字解释 -->
+    <view class="plain-box">
+      <view class="plain-box-title">四维特征解读</view>
+      <view wx:for="{{report.plainTraits}}" wx:key="title" class="plain-item">
+        <text class="plain-item-head">{{item.title}}：</text>
+        <text class="plain-item-body">{{item.text}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块 ②：六维需求解析（支持流量主激励视频解锁扩展钩子） -->
+  <view class="card">
+    <view class="section-title">② 六维需求解析</view>
+    <view wx:for="{{report.sixNeeds}}" wx:key="key" class="need-item">
+      <view class="need-head">
+        <view class="need-title-wrap">
+          <view class="need-dot" style="{{'background:' + item.color + ';'}}"></view>
+          <text class="need-name">{{item.name}}</text>
+          <text wx:if="{{item.hasGap}}" class="gap-badge">双方有温差</text>
+        </view>
+        <text class="need-score" style="{{'color:' + item.color + ';'}}">{{item.score}} / 100</text>
+      </view>
+      <view class="need-track">
+        <view class="need-fill" style="{{'width:' + item.score + '%; background:' + item.color + ';'}}"></view>
+      </view>
+      <view class="need-desc">{{item.desc}}</view>
+    </view>
+  </view>
+
+  <!-- 模块 ③：内在优势与典型短板 -->
+  <view class="card">
+    <view class="section-title">③ 内在优势与典型短板</view>
+    <view class="sw-card sw-pros">
+      <view class="sw-badge-row">
+        <text class="sw-tag tag-emerald">核心优势</text>
+        <text class="sw-sub">关系里最加分的底牌</text>
+      </view>
+      <view class="sw-text">{{report.pros}}</view>
+    </view>
+    <view class="sw-card sw-cons">
+      <view class="sw-badge-row">
+        <text class="sw-tag tag-rose">典型短板</text>
+        <text class="sw-sub">压力下最容易踩的坑</text>
+      </view>
+      <view class="sw-text">{{report.cons}}</view>
+    </view>
+  </view>
+
+  <!-- 模块 ④（仅单人）：适配伴侣类型 -->
+  <view wx:if="{{!report.isPair}}" class="card">
+    <view class="section-title">④ 适配伴侣类型</view>
+    <view wx:for="{{report.matches}}" wx:key="code" class="match-item">
+      <view class="match-top">
+        <view>
+          <text class="match-title">{{item.title}}</text>
+          <text class="match-code">{{item.code}}</text>
+        </view>
+        <text class="match-tag">{{item.tag}}</text>
+      </view>
+      <view class="match-reason">
+        <text class="match-reason-label">适配原因：</text>{{item.reason}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 模块 ⑤：最小可执行改进计划 -->
+  <view class="card">
+    <view class="section-title">{{report.isPair ? '④ 最小可执行改进计划' : '⑤ 最小可执行改进计划'}}</view>
+    <view class="plan-box">{{report.plan}}</view>
+
+    <!-- 后续接入 wx.cloud.extend.AI 深度合盘的预留入口 -->
+    <view wx:if="{{aiEnabled}}" class="ai-box">
+      <view class="ai-title">AI 逐题专属相处翻译官</view>
+      <view wx:if="{{aiInsight}}" class="ai-content">{{aiInsight}}</view>
+      <button wx:else class="btn-secondary" loading="{{aiLoading}}" bindtap="generateAiInsight">
+        生成 AI 定制相处指南
+      </button>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="footer-actions">
+    <button class="btn-primary" open-type="share">分享报告给微信好友</button>
+    <button class="btn-outline action-gap" bindtap="retestSameMode">{{report.isPair ? '再开一局双人盲答' : '重新测一遍'}}</button>
+    <button class="btn-outline action-gap" bindtap="goHome">返回首页</button>
+  </view>
+
+  <!-- 理论参考小字 -->
+  <view class="theory-footer">
+    <view class="muted-note">
+      理论参考：感知伴侣回应性（PPR）、健康边界理论、戈特曼修复尝试模型（Gottman）与微信任机制（Micro-trust）。结果仅供亲密关系探索参考，不构成专业医疗或心理诊断。
+    </view>
+  </view>
+</view>

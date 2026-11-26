@@ -1,0 +1,93 @@
+<view class="container">
+  <!-- 房间失效或已满员提示卡片 -->
+  <view wx:if="{{roomError}}" class="card error-card">
+    <view class="error-badge">无法进入房间</view>
+    <view class="error-title">{{roomErrorTitle}}</view>
+    <view class="error-desc">{{roomErrorDesc}}</view>
+    <button class="btn-primary" bindtap="clearErrorAndCreate">重新创建一个双人房间</button>
+    <button class="btn-outline action-gap" bindtap="backToHome">返回首页</button>
+  </view>
+
+  <!-- 未进房：创建或输入房间码加入 -->
+  <view wx:elif="{{!roomCode}}">
+    <view class="card">
+      <view class="section-title">发起双人盲答</view>
+      <view class="room-desc">创建一个专属 6 位房间码，直接转发微信好友卡片给伴侣。双方独立作答、互不偷看，交卷后自动生成双人合盘报告。</view>
+      <button class="btn-primary" loading="{{creating}}" bindtap="handleCreateRoom">创建双人房间</button>
+    </view>
+
+    <view class="card">
+      <view class="section-title">输入好友房间码加入</view>
+      <input
+        class="code-input"
+        maxlength="6"
+        placeholder="输入 6 位房间码（如 A8K2M9）"
+        value="{{inputCode}}"
+        bindinput="onCodeInput"
+      />
+      <button class="btn-secondary" loading="{{joining}}" bindtap="handleJoinRoom">进入房间并作答</button>
+    </view>
+  </view>
+
+  <!-- 已进房：等待或开始我的答卷 -->
+  <view wx:else>
+    <view class="card room-status-card">
+      <view class="room-badge-row" bindtap="copyRoomCode">
+        <text class="room-badge">房间号 · {{roomCode}}（点击复制）</text>
+      </view>
+      <view wx:if="{{localMode}}" class="waiting-tip waiting-warn">
+        开发提示：当前未连接云开发，房间只保存在本机，另一台手机无法同步。请在 app.js 填入 cloudEnvId 并部署 cptiSync 云函数。
+      </view>
+      <view class="room-hero-title">{{bothReady ? '双方均已交卷，报告已就绪！' : (mySubmitted ? '你已交卷，正在等伴侣完成...' : '请先完成你的独立盲答')}}</view>
+      <view wx:if="{{mySubmitted && !bothReady}}" class="waiting-time">{{waitingText}}</view>
+      <view wx:if="{{mySubmitted && !bothReady}}" class="waiting-tip">
+        对方可能还没开始测试，先回主页也没关系：房间 24 小时内有效，对方交卷后你随时回来都能看到合盘结果。
+      </view>
+      <view wx:if="{{mySubmitted && !bothReady && otherExited}}" class="waiting-tip waiting-warn">
+        对方刚退出了房间，可能只是暂时离开，你可以先回主页稍后再来。
+      </view>
+
+      <view class="seats-row">
+        <view class="seat-box {{aSubmitted ? 'seat-done' : ''}}">
+          <view class="seat-name">发起方（席位 A）{{seat === 'A' ? '· 我' : ''}}</view>
+          <view class="seat-state">{{aSubmitted ? '✓ 已交卷' : '作答中...'}}</view>
+        </view>
+        <view class="seat-box {{bSubmitted ? 'seat-done' : ''}}">
+          <view class="seat-name">受邀方（席位 B）{{seat === 'B' ? '· 我' : ''}}</view>
+          <view class="seat-state">{{bSubmitted ? '✓ 已交卷' : '等待加入/作答'}}</view>
+        </view>
+      </view>
+
+      <!-- 未交卷：主操作为开始 / 继续答题 -->
+      <block wx:if="{{!mySubmitted && !bothReady}}">
+        <button class="btn-primary invite-btn" bindtap="startMyQuiz">
+          {{hasDraft ? '继续答题' : '开始答题'}}
+        </button>
+        <button wx:if="{{!isGuest}}" class="btn-secondary action-gap" open-type="share">
+          分享房间邀请对方
+        </button>
+      </block>
+
+      <!-- 已交卷等待对方：发起方可直接回主页，受邀方可提醒对方回来看结果 -->
+      <block wx:if="{{mySubmitted && !bothReady}}">
+        <button wx:if="{{!isGuest}}" class="btn-primary action-gap" open-type="share">
+          提醒对方来答题
+        </button>
+        <button wx:else class="btn-primary action-gap" open-type="share">
+          提醒对方来看结果
+        </button>
+        <button class="btn-outline action-gap" bindtap="backToHome">回到主页，稍后再来</button>
+      </block>
+
+      <!-- 双方交卷完成 -->
+      <button wx:if="{{bothReady}}" class="btn-primary action-gap" bindtap="openPairReport">
+        查看双人合盘报告
+      </button>
+      <button wx:if="{{bothReady}}" class="btn-secondary action-gap" bindtap="clearErrorAndCreate">
+        再开一局
+      </button>
+
+      <button class="btn-outline action-gap" bindtap="confirmResetRoom">退出当前房间</button>
+    </view>
+  </view>
+</view>

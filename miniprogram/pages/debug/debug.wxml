@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="card debug-card">
+    <view class="debug-title">CPTI 测试面板</view>
+    <view class="debug-sub">仅开发版 / 体验版可用，正式版自动隐藏入口</view>
+
+    <view class="env-row"><text>调试模式</text><text class="env-val">{{debug ? '开启' : '关闭'}}</text></view>
+    <view class="env-row"><text>云开发</text><text class="env-val">{{cloudReady ? '已连接' : '本地模式'}}</text></view>
+    <view class="env-row"><text>环境 ID</text><text class="env-val env-id">{{cloudEnvId}}</text></view>
+    <view class="env-row"><text>当前房间</text><text class="env-val">{{roomCode || '无'}}</text></view>
+
+    <button class="btn-outline debug-btn" bindtap="clearAll">清除所有测试数据</button>
+    <button class="btn-primary debug-btn" bindtap="makeSoloReport">生成单人报告并查看</button>
+    <button class="btn-secondary debug-btn" bindtap="makePairRoom">创建双人测试房间</button>
+    <button class="btn-primary debug-btn" bindtap="submitBoth">模拟 A/B 双方交卷</button>
+    <button class="btn-outline debug-btn" bindtap="goHome">返回首页</button>
+
+    <view class="log-title">操作日志</view>
+    <view class="log-box">
+      <view wx:for="{{logs}}" wx:for-index="idx" wx:key="idx" class="log-line">{{item}}</view>
+    </view>
+  </view>
+</view>

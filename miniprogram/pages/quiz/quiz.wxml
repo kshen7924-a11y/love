@@ -1,0 +1,74 @@
+<view class="container">
+  <!-- 顶部进度条 -->
+  <view class="progress-wrap">
+    <view class="progress-top">
+      <text class="axis-tag" style="{{'color:' + axisColor + '; background:' + axisBg + ';'}}">{{axisTag}}</text>
+      <text class="progress-num" wx:if="{{!showSourceStep}}">第 {{progressCurrent}} / {{progressTotal}} 题</text>
+      <text class="progress-num" wx:else>最后一步</text>
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="{{'width:' + progressPercent + '%; background:' + axisColor + ';'}}"></view>
+    </view>
+  </view>
+
+  <!-- 草稿续答提示条 -->
+  <view wx:if="{{resumedFromDraft && !showSourceStep}}" class="draft-banner">
+    <text class="draft-text">已为你恢复上次未完成的作答进度</text>
+    <text class="draft-reset" bindtap="restartQuiz">从头重测</text>
+  </view>
+
+  <!-- 题目作答卡片 -->
+  <view wx:if="{{!showSourceStep}}" class="card quiz-card">
+    <view class="question-text">{{questionText}}</view>
+
+    <!-- 高对比神吐槽旁白气泡 -->
+    <view class="roast-box" style="{{'border-left-color:' + axisColor + ';'}}">
+      <text class="roast-badge" style="{{'background:' + axisColor + ';'}}">吐槽</text>
+      <text class="roast-text">{{roastText}}</text>
+    </view>
+
+    <!-- 5 档行为符合度选项 -->
+    <view class="options-list">
+      <view
+        wx:for="{{levels}}"
+        wx:key="score"
+        class="option-item {{selectedValue === item.score ? 'option-active' : ''}}"
+        style="{{selectedValue === item.score ? 'border-color:' + axisColor + '; background:' + axisBg + ';' : ''}}"
+        data-score="{{item.score}}"
+        bindtap="selectOption"
+      >
+        <view class="option-dot" style="{{selectedValue === item.score ? 'background:' + axisColor + '; border-color:' + axisColor + ';' : ''}}"></view>
+        <text class="option-label">{{item.label}}</text>
+      </view>
+    </view>
+
+    <view class="quiz-actions">
+      <button wx:if="{{canGoPrev}}" class="btn-outline action-btn prev-btn" bindtap="goPrev">← 上一题</button>
+      <button class="btn-outline action-btn skip-btn" bindtap="skipQuestion">没遇过 / 跳过</button>
+    </view>
+  </view>
+
+  <!-- 单人专属：经历来源校准步 -->
+  <view wx:else class="card quiz-card">
+    <view class="question-text">你刚才的回答，主要基于哪种情况？</view>
+    <view class="roast-box" style="border-left-color: #33A474;">
+      <text class="roast-badge" style="background: #33A474;">说明</text>
+      <text class="roast-text">凭想象作答会为你标注「恋爱预演」，帮助你更客观地参考结果。</text>
+    </view>
+
+    <view class="options-list">
+      <view class="option-item" data-source="real" bindtap="finishSoloWithSource">
+        <view class="option-dot"></view>
+        <text class="option-label">真实恋爱 / 暧昧相处经历</text>
+      </view>
+      <view class="option-item" data-source="imagination" bindtap="finishSoloWithSource">
+        <view class="option-dot"></view>
+        <text class="option-label">目前单身，凭想象中的相处作答</text>
+      </view>
+    </view>
+
+    <view class="quiz-actions">
+      <button class="btn-outline action-btn back-btn" bindtap="backFromSource">← 返回最后一题</button>
+    </view>
+  </view>
+</view>

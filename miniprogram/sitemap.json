@@ -1,0 +1,9 @@
+{
+  "desc": "CPTI 恋爱人格测试索引配置",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

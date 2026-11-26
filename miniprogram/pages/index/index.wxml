@@ -1,0 +1,66 @@
+<view class="container">
+  <!-- 顶部品牌主视觉 -->
+  <view class="hero-banner">
+    <view class="brand-pill" bindlongpress="goDebug">CPTI · COUPLE PERSONALITY TYPE INDICATOR</view>
+    <view class="hero-title">测清你们在亲密关系里的真实角色</view>
+    <view class="hero-sub">12–16 题拆解四维倾向与六维需求。</view>
+    <image
+      wx:if="{{!heroImgError}}"
+      class="hero-art"
+      src="{{heroImg}}"
+      mode="aspectFill"
+      binderror="onHeroImgError"
+    />
+  </view>
+
+  <!-- 模式入口卡片 -->
+  <view class="card entry-card" bindtap="startSolo">
+    <view class="entry-left">
+      <view class="entry-tag tag-green">单人深度测评 · 约 2 分钟</view>
+      <view class="entry-title">测我在关系里的角色</view>
+      <view class="entry-desc">四位代码、画像、需求与适配伴侣。</view>
+    </view>
+    <view class="entry-right">
+      <image wx:if="{{!soloImgError}}" class="entry-icon" src="{{entrySoloImg}}" mode="aspectFit" binderror="onSoloImgError" />
+      <view wx:else class="entry-badge badge-green">我</view>
+    </view>
+  </view>
+
+  <view class="card entry-card" bindtap="goPairRoom">
+    <view class="entry-left">
+      <view class="entry-tag tag-blue">双人独立盲答 · 微信好友直连</view>
+      <view class="entry-title">测我们是哪种情侣</view>
+      <view class="entry-desc">独立盲答，交卷揭晓合盘结果。</view>
+    </view>
+    <view class="entry-right">
+      <image wx:if="{{!pairImgError}}" class="entry-icon" src="{{entryPairImg}}" mode="aspectFit" binderror="onPairImgError" />
+      <view wx:else class="entry-badge badge-blue">TA</view>
+    </view>
+  </view>
+
+  <!-- 双人房间进度提醒（回主页后也能看到对方是否已交卷） -->
+  <view wx:if="{{pairRoomCode}}" class="card quick-card" bindtap="goPairRoom">
+    <view>
+      <view class="quick-label">{{pairRoomReady ? '双人合盘已就绪' : '双人盲答进行中'}}</view>
+      <view class="quick-val">{{pairRoomReady ? '对方的答卷已到，点击查看结果' : (pairRoomMySubmitted ? '你已交卷 · 房间号 ' + pairRoomCode : '房间号 ' + pairRoomCode + ' · 还没交卷')}}</view>
+    </view>
+    <view class="quick-arrow">{{pairRoomReady ? '查看结果 ›' : '进入房间 ›'}}</view>
+  </view>
+
+  <!-- 最近报告快捷回看 -->
+  <view wx:if="{{hasSoloReport}}" class="card quick-card" bindtap="openLastSoloReport">
+    <view>
+      <view class="quick-label">上次单人测评结果</view>
+      <view class="quick-val">{{lastSoloTitle}} · {{lastSoloCode}}</view>
+    </view>
+    <view class="quick-arrow">查看报告 ›</view>
+  </view>
+
+  <!-- 理论参考与科学背书 -->
+  <view class="theory-footer">
+    <view class="theory-title">理论与测量参考</view>
+    <view class="muted-note">
+      维度参考感知伴侣回应性、健康边界、戈特曼修复模型与微信任机制；结果仅供亲密关系探索，不构成心理诊断。
+    </view>
+  </view>
+</view>

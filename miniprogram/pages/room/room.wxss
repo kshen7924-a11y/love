@@ -1,0 +1,139 @@
+.room-desc {
+  font-size: 26rpx;
+  color: #6B7280;
+  line-height: 1.6;
+  margin-bottom: 28rpx;
+}
+
+.code-input {
+  height: 92rpx;
+  background: #F3F4F6;
+  border-radius: 20rpx;
+  padding: 0 28rpx;
+  font-size: 32rpx;
+  font-weight: 800;
+  letter-spacing: 4rpx;
+  margin-bottom: 24rpx;
+  color: #111827;
+}
+
+.error-card {
+  text-align: center;
+  padding: 48rpx 32rpx;
+}
+
+.error-badge {
+  display: inline-block;
+  background: #FFE4E6;
+  color: #BE123C;
+  font-size: 24rpx;
+  font-weight: 800;
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  margin-bottom: 18rpx;
+}
+
+.error-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 12rpx;
+}
+
+.error-desc {
+  font-size: 26rpx;
+  color: #6B7280;
+  line-height: 1.6;
+  margin-bottom: 32rpx;
+}
+
+.room-status-card {
+  text-align: center;
+  padding: 40rpx 32rpx;
+}
+
+.room-badge-row {
+  margin-bottom: 20rpx;
+}
+
+.room-badge {
+  display: inline-block;
+  background: #E8F6F0;
+  color: #25855D;
+  font-size: 25rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  padding: 10rpx 26rpx;
+  border-radius: 999rpx;
+}
+
+.room-hero-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 16rpx;
+}
+
+.waiting-time {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #B45309;
+  margin-bottom: 10rpx;
+}
+
+.waiting-tip {
+  font-size: 24rpx;
+  color: #6B7280;
+  margin-bottom: 24rpx;
+  line-height: 1.5;
+}
+
+.waiting-warn {
+  color: #B45309;
+}
+
+.seats-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.seat-box {
+  flex: 1;
+  background: #F9FAFB;
+  border: 2rpx solid #E5E7EB;
+  border-radius: 20rpx;
+  padding: 24rpx 16rpx;
+}
+
+.seat-done {
+  background: #E8F6F0;
+  border-color: #33A474;
+}
+
+.seat-name {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 8rpx;
+}
+
+.seat-state {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #111827;
+}
+
+.room-status-card button,
+.error-card button {
+  width: 100%;
+}
+
+.invite-btn {
+  font-size: 30rpx;
+}
+
+.action-gap {
+  margin-top: 18rpx;
+}

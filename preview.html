@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPTI 恋爱人格测验 · 本地预览</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #eef1f5;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 60px; }
+    .page-head h1 { font-size: 24px; margin: 0 0 6px; color: #111827; }
+    .page-head p { margin: 0 0 22px; color: #6b7280; font-size: 13px; line-height: 1.7; }
+    .layout { display: flex; gap: 28px; align-items: flex-start; }
+    .phone-col { flex: 0 0 420px; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+    .tab {
+      flex: 1; border: 1px solid #dfe4ea; background: #fff; color: #4b5563;
+      border-radius: 999px; padding: 9px 0; font-size: 13px; cursor: pointer;
+      transition: .2s;
+    }
+    .tab.active { background: #33a474; border-color: #33a474; color: #fff; font-weight: 700; }
+    .phone {
+      position: relative; width: 400px; height: 780px; background: #f7f8fa;
+      border: 10px solid #1f2937; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 26px 60px rgba(15,23,42,.22); display: flex; flex-direction: column;
+    }
+    .statusbar {
+      height: 30px; padding: 0 22px; display: flex; align-items: center;
+      justify-content: space-between; background: #fff; font-size: 11px; color: #374151;
+      font-weight: 700; flex-shrink: 0;
+    }
+    .navbar {
+      height: 46px; background: #fff; border-bottom: 1px solid #eef1f5;
+      display: flex; align-items: center; justify-content: center; position: relative;
+      font-size: 15px; font-weight: 700; color: #111827; flex-shrink: 0;
+    }
+    .nav-back {
+      position: absolute; left: 16px; font-size: 26px; line-height: 1; color: #6b7280;
+      cursor: pointer; user-select: none;
+    }
+    .viewport { flex: 1; overflow-y: auto; overflow-x: hidden; }
+    .viewport::-webkit-scrollbar { width: 5px; }
+    .viewport::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9px; }
+    .screen { display: none; padding: 16px 16px 34px; }
+    .screen.active { display: block; }
+    .home-indicator {
+      height: 5px; width: 120px; background: #111827; border-radius: 9px;
+      margin: 7px auto 9px; opacity: .8; flex-shrink: 0;
+    }
+    .toast {
+      position: absolute; left: 50%; bottom: 90px; transform: translateX(-50%);
+      background: rgba(17,24,39,.9); color: #fff; padding: 10px 18px; border-radius: 10px;
+      font-size: 12px; z-index: 20; white-space: nowrap;
+    }
+    .card {
+      background: #fff; border: 1px solid #eef1f5; border-radius: 16px;
+      padding: 16px; margin-bottom: 12px; box-shadow: 0 6px 18px rgba(15,23,42,.04);
+    }
+    .hero {
+      background: linear-gradient(135deg,#33a474,#4298b4); color: #fff;
+      border-radius: 18px; padding: 20px 17px 18px; margin-bottom: 14px;
+    }
+    .pill {
+      display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 1px;
+      background: rgba(255,255,255,.18); padding: 5px 11px; border-radius: 999px; margin-bottom: 10px;
+    }
+    .hero h2 { font-size: 21px; line-height: 1.3; margin: 0 0 7px; }
+    .hero p { font-size: 12px; line-height: 1.55; margin: 0; color: rgba(255,255,255,.92); }
+    .hero-art {
+      margin-top: 12px; height: 96px; border: 1px dashed rgba(255,255,255,.6);
+      border-radius: 12px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; font-size: 11px; color: rgba(255,255,255,.9); line-height: 1.6;
+    }
+    .hero-art b { font-size: 22px; letter-spacing: 3px; }
+    .entry { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; }
+    .entry:active { opacity: .7; }
+    .entry-left { flex: 1; }
+    .tag {
+      display: inline-block; font-size: 10px; font-weight: 800; padding: 3px 9px;
+      border-radius: 999px; margin-bottom: 7px;
+    }
+    .tag-green { background: #e8f6f0; color: #25855d; }
+    .tag-blue { background: #eaf5f8; color: #2e7a93; }
+    .entry-title { font-size: 17px; font-weight: 800; color: #111827; margin-bottom: 4px; }
+    .entry-desc { font-size: 11px; color: #6b7280; line-height: 1.5; }
+    .entry-badge {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800;
+    }
+    .badge-green { background: #e8f6f0; color: #33a474; }
+    .badge-blue { background: #eaf5f8; color: #4298b4; }
+    .quick { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; }
+    .quick-label { font-size: 10px; color: #6b7280; }
+    .quick-val { font-size: 14px; font-weight: 800; margin-top: 2px; }
+    .quick-arrow { font-size: 12px; font-weight: 700; color: #33a474; }
+    .theory { margin-top: 16px; padding: 0 4px; }
+    .theory b { font-size: 11px; color: #6b7280; }
+    .theory p { font-size: 10px; color: #9ca3af; line-height: 1.6; margin: 5px 0; }
+    .progress-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+    .axis-tag { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
+    .progress-num { font-size: 11px; font-weight: 700; color: #6b7280; }
+    .progress-track { height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; margin-bottom: 12px; }
+    .progress-fill { height: 100%; border-radius: 999px; transition: width .25s; }
+    .quiz-card { padding: 18px 16px; }
+    .question { font-size: 18px; font-weight: 800; line-height: 1.45; margin-bottom: 12px; }
+    .roast {
+      background: #f8fafc; border-left: 4px solid #33a474; border-radius: 9px;
+      padding: 10px 11px; display: flex; gap: 7px; margin-bottom: 16px;
+    }
+    .roast-badge {
+      flex-shrink: 0; height: fit-content; color: #fff; font-size: 9px; font-weight: 800;
+      padding: 2px 6px; border-radius: 5px; margin-top: 2px;
+    }
+    .roast-text { font-size: 12px; color: #374151; line-height: 1.55; }
+    .options { display: flex; flex-direction: column; gap: 8px; }
+    .option {
+      display: flex; align-items: center; gap: 10px; padding: 12px 13px;
+      border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; cursor: pointer;
+    }
+    .option:hover { border-color: #33a474; }
+    .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #9ca3af; flex-shrink: 0; }
+    .option-label { font-size: 13px; font-weight: 700; }
+    .row { display: flex; gap: 10px; margin-top: 16px; }
+    .btn {
+      flex: 1; border-radius: 999px; padding: 11px 8px; font-size: 12px; font-weight: 700;
+      cursor: pointer; text-align: center; border: 1px solid #d1d5db; background: #fff; color: #374151;
+    }
+    .btn:active { opacity: .75; }
+    .btn-green { background: #33a474; border-color: #33a474; color: #fff; }
+    .btn-blue { background: #4298b4; border-color: #4298b4; color: #fff; }
+    .btn-block { width: 100%; margin-top: 10px; }
+    .section-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+    .room-desc { font-size: 11px; color: #6b7280; line-height: 1.6; margin: 0 0 14px; }
+    .code-input {
+      width: 100%; height: 44px; background: #f3f4f6; border-radius: 10px; border: 0;
+      padding: 0 14px; font-size: 15px; font-weight: 800; letter-spacing: 3px;
+      color: #111827; outline: none; margin-bottom: 10px; text-transform: uppercase;
+    }
+    .room-badge {
+      display: inline-block; background: #e8f6f0; color: #25855d; font-size: 11px;
+      font-weight: 800; letter-spacing: 1px; padding: 6px 13px; border-radius: 999px; cursor: pointer;
+    }
+    .room-title { font-size: 17px; font-weight: 800; text-align: center; margin: 14px 0 6px; }
+    .waiting { font-size: 11px; color: #6b7280; text-align: center; line-height: 1.5; margin-bottom: 12px; }
+    .seats { display: flex; gap: 10px; margin: 12px 0 14px; }
+    .seat {
+      flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 11px;
+      padding: 11px 8px; text-align: center;
+    }
+    .seat.done { background: #e8f6f0; border-color: #33a474; }
+    .seat-name { font-size: 10px; font-weight: 700; color: #374151; margin-bottom: 4px; }
+    .seat-state { font-size: 12px; font-weight: 800; }
+    .poster { text-align: center; padding: 20px 16px; }
+    .poster-group {
+      display: inline-block; font-size: 10px; font-weight: 700; color: #6b7280;
+      background: #f3f4f6; padding: 4px 10px; border-radius: 999px; margin-bottom: 9px;
+    }
+    .poster-title { font-size: 27px; font-weight: 900; letter-spacing: 1px; line-height: 1.2; }
+    .poster-code { font-size: 15px; font-weight: 900; color: #1e7e56; letter-spacing: 5px; margin: 6px 0 12px; }
+    .poster-art { width: 100%; height: 170px; object-fit: contain; }
+    .poster-oneliner { font-size: 13px; font-weight: 800; line-height: 1.5; margin-top: 10px; }
+    .intro { font-size: 12px; color: #4b5563; line-height: 1.65; margin-bottom: 14px; }
+    .sub-title { font-size: 12px; font-weight: 800; color: #374151; margin: 14px 0 8px; }
+    .axis-row { margin-bottom: 10px; }
+    .axis-labels { display: flex; justify-content: space-between; font-size: 10px; color: #6b7280; margin-bottom: 4px; }
+    .axis-active { font-weight: 800; color: #111827; }
+    .axis-pct { font-weight: 700; color: #374151; }
+    .track { height: 7px; background: #eef1f5; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; }
+    .split { height: 100%; background: linear-gradient(90deg,#88619a,#e5e7eb 50%,#33a474); }
+    .grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .grid-item { width: calc(50% - 4px); background: #f9fafb; padding: 9px 10px; border-radius: 9px; }
+    .grid-top { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 5px; }
+    .grid-name { font-weight: 700; color: #374151; }
+    .mini-track { height: 5px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .plain { margin-top: 14px; background: #f8fafc; border-radius: 10px; padding: 12px; }
+    .plain b { font-size: 12px; }
+    .plain p { font-size: 11px; line-height: 1.6; color: #4b5563; margin: 7px 0 0; }
+    .plain p strong { color: #1f2937; }
+    .need { padding-bottom: 11px; margin-bottom: 11px; border-bottom: 1px solid #f3f4f6; }
+    .need:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+    .need-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .need-left { display: flex; align-items: center; gap: 6px; }
+    .need-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .need-name { font-size: 13px; font-weight: 800; }
+    .need-score { font-size: 12px; font-weight: 800; }
+    .gap { font-size: 9px; color: #b45309; background: #fef3c7; padding: 1px 6px; border-radius: 999px; }
+    .need-desc { font-size: 11px; color: #4b5563; line-height: 1.55; margin-top: 5px; }
+    .sw { border: 1px solid #e5e7eb; border-top-width: 4px; border-radius: 11px; padding: 12px; margin-bottom: 9px; }
+    .sw.pros { border-top-color: #33a474; }
+    .sw.cons { border-top-color: #e11d48; }
+    .sw-tag { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+    .sw-tag.green { background: #e8f6f0; color: #1e7e56; }
+    .sw-tag.rose { background: #ffe4e6; color: #be123c; }
+    .sw-sub { font-size: 9px; color: #9ca3af; float: right; }
+    .sw-text { font-size: 12px; line-height: 1.6; margin-top: 8px; }
+    .match { background: #f9fafb; border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+    .match-top { display: flex; justify-content: space-between; align-items: center; }
+    .match-title { font-size: 14px; font-weight: 800; }
+    .match-code { font-size: 11px; font-weight: 800; color: #33a474; margin-left: 6px; }
+    .match-tag { font-size: 9px; font-weight: 700; color: #25855d; background: #e8f6f0; padding: 2px 8px; border-radius: 999px; }
+    .match-reason { font-size: 11px; color: #4b5563; line-height: 1.6; margin-top: 6px; }
+    .plan { background: #e8f6f0; color: #164e38; font-size: 12px; font-weight: 700; line-height: 1.65; padding: 13px; border-radius: 10px; }
+    .notes { flex: 1; min-width: 0; }
+    .notes-card { background: #fff; border-radius: 18px; padding: 22px; box-shadow: 0 10px 30px rgba(15,23,42,.05); }
+    .notes-card h3 { margin: 0 0 4px; font-size: 16px; }
+    .notes-card .sub { font-size: 11px; color: #9ca3af; margin-bottom: 18px; }
+    .issue { border-left: 3px solid #e5e7eb; padding: 0 0 0 12px; margin-bottom: 17px; }
+    .issue.high { border-left-color: #e11d48; }
+    .issue.mid { border-left-color: #f59e0b; }
+    .issue.low { border-left-color: #4298b4; }
+    .issue-title { font-size: 12px; font-weight: 800; margin-bottom: 4px; }
+    .issue-body { font-size: 11px; color: #6b7280; line-height: 1.65; }
+    .issue-body code { background: #f3f4f6; padding: 1px 4px; border-radius: 4px; font-size: 10px; }
+    .legend { margin-top: 18px; padding-top: 14px; border-top: 1px solid #f3f4f6; font-size: 10px; color: #9ca3af; line-height: 1.7; }
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; align-items: center; }
+      .notes { width: 100%; }
+      .phone { width: 100%; max-width: 400px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>CPTI 恋爱人格测验 · 本地预览</h1>
+      <p>根据你上传的 <code>cpti-miniprogram-v6/cpti-miniprogram</code> 工程生成。这是浏览器离线外观预览，可点击体验首页、答题、双人房与报告四个页面；真机预览仍需用微信开发者工具导入工程。</p>
+    </div>
+
+    <div class="layout">
+      <div class="phone-col">
+        <div class="toolbar">
+          <button class="tab active" data-go="home">首页</button>
+          <button class="tab" data-go="quiz">答题</button>
+          <button class="tab" data-go="room">双人房</button>
+          <button class="tab" data-go="report">报告</button>
+        </div>
+        <div class="phone" id="phone">
+          <div class="statusbar"><span>9:41</span><span>CPTI · 预览</span></div>
+          <div class="navbar">
+            <span class="nav-back" id="navBack">‹</span>
+            <span id="navTitle">CPTI 恋爱人格测验</span>
+          </div>
+          <div class="viewport" id="viewport">
+            <section class="screen active" id="screen-home"></section>
+            <section class="screen" id="screen-quiz">
+              <div class="progress-top">
+                <span class="axis-tag" id="axisTag"></span>
+                <span class="progress-num" id="progressNum"></span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+              <div class="card quiz-card" id="quizCard"></div>
+            </section>
+            <section class="screen" id="screen-room"><div id="roomContent"></div></section>
+            <section class="screen" id="screen-report"><div id="reportContent"></div></section>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+
+      <aside class="notes">
+        <div class="notes-card">
+          <h3>工程检查摘要</h3>
+          <div class="sub">上传工程：cpti-miniprogram-v6/cpti-miniprogram</div>
+
+          <div class="issue high">
+            <div class="issue-title">导入目录别选错</div>
+            <div class="issue-body">应导入 <code>cpti-miniprogram</code> 目录（<code>miniprogramRoot = miniprogram/</code>）。工作区根目录仍是上一版恋爱人格测试，导入后会看到旧项目。</div>
+          </div>
+          <div class="issue high">
+            <div class="issue-title">4 张图片缺失</div>
+            <div class="issue-body"><code>home_hero.png</code>、<code>entry_solo.png</code>、<code>entry_pair.png</code>、<code>open_solo_split.png</code> 未找到；现有 <code>open_single_axis.png</code> 疑似命名不一致。前两张入口图有文字兜底，主视觉区域会留白。</div>
+          </div>
+          <div class="issue mid">
+            <div class="issue-title">AppID 是占位值</div>
+            <div class="issue-body"><code>project.config.json</code> 中为 <code>touristappid</code>，需要填写真实 AppID 或选择测试号才能正常预览、分享。</div>
+          </div>
+          <div class="issue mid">
+            <div class="issue-title">云同步未启用</div>
+            <div class="issue-body"><code>app.js</code> 的 <code>cloudEnvId</code> 为空，双人盲答只能本地模拟；跨设备联机需开通云开发、创建 <code>cpti_rooms</code> 集合并部署 <code>cptiSync</code> 云函数。</div>
+          </div>
+          <div class="issue low">
+            <div class="issue-title">AI 入口与模型名</div>
+            <div class="issue-body"><code>aiConfig.enabled</code> 为 false，AI 按钮默认隐藏；且 <code>report.js</code> 用 <code>hunyuan-exp</code>，<code>app.js</code> 写的是 <code>hunyuan-lite</code>，启用前建议统一。</div>
+          </div>
+          <div class="issue low">
+            <div class="issue-title">代码本身检查</div>
+            <div class="issue-body">4 个页面文件齐全，JSON 配置有效，JS 语法通过，WXML 未发现未定义事件或错误路径，导航路由均可解析。</div>
+          </div>
+          <div class="legend">预览说明：报告页使用内置的 RBFK 示例数据，答题页为真实题库与交互逻辑的浏览器模拟；所有图片直接读取你上传的 <code>miniprogram/assets/</code> 目录。</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const AXIS_META = [
+      { name:'回应模式', posCode:'R', posLabel:'共情接频', negCode:'M', negLabel:'问题排障', color:'#33A474', bg:'#E8F6F0' },
+      { name:'边界方式', posCode:'B', posLabel:'留白透气', negCode:'P', negLabel:'介入操心', color:'#4298B4', bg:'#EAF5F8' },
+      { name:'修复速度', posCode:'F', posLabel:'当场清零', negCode:'H', negLabel:'体面冷存', color:'#88619A', bg:'#F3EDF6' },
+      { name:'兑现可靠', posCode:'K', posLabel:'落地有声', negCode:'D', negLabel:'弹性改签', color:'#E4AE3A', bg:'#FCF6E8' }
+    ];
+
+    const QUESTIONS = [
+      { axis:0, dir:1, follow:false, solo:'对方吐槽加班或烦心事时，我会先顺着情绪安抚，再问对方想不想听建议。', couple:'一方说「先听我吐槽」时，另一方能忍住不打断、先把情绪接住。', soloRoast:'很多吵架的源头，就是一方在求抱抱，另一方在开复盘会。', coupleRoast:'闭嘴听完五分钟，难度有时候堪比徒手修电脑。' },
+      { axis:0, dir:-1, follow:false, solo:'哪怕对方明确说「先别出主意」，我还是会忍不住把解决办法一条条列出来。', couple:'只要一方抛出烦恼，另一方就会本能开启「诊断 + 支招」模式。', soloRoast:'好心当成驴肝肺的时候，通常是因为你正在给情绪开处方。', coupleRoast:'一个在演苦情剧，一个在当项目经理，频道差了十万八千里。' },
+      { axis:0, dir:1, follow:true, solo:'对方语气明显低落但嘴上说「没事」时，我会停下手头的事先关心一下。', couple:'一方开口求帮忙或情绪低落时，我们能先稳住气氛再一起商量办法。', soloRoast:'「没事」两个字在恋爱词典里，翻译过来通常叫「快点来哄我」。', coupleRoast:'先解决心情再解决事情，顺序反了容易双双原地爆炸。' },
+      { axis:1, dir:1, follow:false, solo:'伴侣临时想一个人待会儿或和朋友聚会，我能痛快放行，不追问也不暗自生闷气。', couple:'彼此都有不汇报行踪的独处或社交时间，谁也不会觉得被冷落。', soloRoast:'真正的安全感不是安装定位器，而是各自出门还能放心回家。', coupleRoast:'连呼吸都要报备的关系，迟早会把对象逼成地下工作者。' },
+      { axis:1, dir:-1, follow:false, solo:'看到对方作息、穿搭或花钱方式不合我意，我总忍不住想帮对方调整过来。', couple:'我们习惯替对方拿主意，小到点菜穿衣、大到社交选择都要插手把关。', soloRoast:'你以为你在搞精装修，对方可能觉得自己住进了管制区。', coupleRoast:'打着「为你好」的旗号越界，是亲密关系里最常见的甜蜜负担。' },
+      { axis:1, dir:1, follow:true, solo:'开玩笑发现对方没笑或有点介意时，我会立刻收住，不拿「你太敏感」当挡箭牌。', couple:'一方提出想独处或某件事不舒服时，边界能立刻被尊重，不会硬拗。', soloRoast:'玩笑好不好笑，从来不是讲笑话的人说了算，得看被开玩笑那位笑没笑。', coupleRoast:'愿意在对方皱眉那一秒踩刹车，比事后买十杯奶茶都管用。' },
+      { axis:2, dir:1, follow:false, solo:'闹别扭冷静下来后，我愿意主动把卡住的点聊开，而不是假装没发生过。', couple:'拌嘴后我们通常当天就能把话说明白，不会把情绪拖过夜。', soloRoast:'冷战就像往地毯底下扫灰，表面干净，踩一脚全是陈年老灰。', coupleRoast:'隔夜仇是感情里的复利贷款，拖得越久利息越吓人。' },
+      { axis:2, dir:-1, follow:false, solo:'道完歉、气氛缓和之后，过一阵子我还是容易回到原来的习惯。', couple:'每次吵架和好都很快，但下次遇到同类小事，旧账还是会被顺手翻出来。', soloRoast:'口头认错五颗星，行动重演一百遍，这叫态度诚恳式摆烂。', coupleRoast:'和好只是按了暂停键，没修的 Bug 下次更新照样准时崩溃。' },
+      { axis:2, dir:1, follow:true, solo:'发现自己确实听岔了或做错了，我能痛快认错，不为了面子硬找台阶。', couple:'说好不再在公开场合揭短或踩雷，下次聚会我们真的能管住嘴。', soloRoast:'承认听岔了不丢人，死扛到底才尴尬。', coupleRoast:'在朋友面前给彼此留面子，是成年人恋爱的基本修养。' },
+      { axis:3, dir:1, follow:false, solo:'答应过对方的事（哪怕只是顺手带杯咖啡或回个消息），我都会记在心上办妥。', couple:'我们之间说好「周末去哪」「晚点回电」，基本都能落地，不用反复催。', soloRoast:'成年人最高级的浪漫，不是画大饼，而是「说好几点就几点」。', coupleRoast:'件件有回音的关系，根本不需要天天查岗。' },
+      { axis:3, dir:-1, follow:false, solo:'发现要晚到十几分钟时，我常想着「快到了」，结果没提前发消息说。', couple:'临时改期或爽约在我们的相处里不算罕见，双方都习惯了临场变卦。', soloRoast:'「已经在路上了」是当代社交三大悬疑片之首。', coupleRoast:'如果每次约定都像航班延误，再好的脾气也会被磨成改签专家。' },
+      { axis:3, dir:1, follow:true, solo:'万一计划有变，我会在第一时间提前同步，并给出新的时间方案。', couple:'遇到加班或突发状况耽误约定，另一方总能提前收到通知和补救安排。', soloRoast:'提前十分钟报备叫体贴，迟到十分钟解释叫公关。', coupleRoast:'靠谱不是永不出错，而是出岔子时永远有备选方案。' },
+      { axis:4, dir:1, follow:false, solo:'谈到未来或同居，我很看重共同储蓄、消费习惯对齐以及抗风险规划。', couple:'我们会认真聊攒钱目标、大额开支分工，觉得把现实账算清才踏实。', soloRoast:'面包自己买得起，但两个人一起烤面包才不容易饿肚子。', coupleRoast:'能把钱聊明白的情侣，抗风险能力直接碾压 80% 的恋爱脑。' },
+      { axis:4, dir:1, follow:false, solo:'比起「先玩开心再说」，大额消费或一起旅行前我更习惯先算清预算和性价比。', couple:'安排约会或长途旅行时，我们会先对齐预算上限，避免超支带来隐形压力。', soloRoast:'浪漫诚可贵，月底还花呗时的清醒更可贵。', coupleRoast:'预算对齐不是抠门，是不让账单成为下次吵架的导火索。' },
+      { axis:5, dir:1, follow:false, solo:'哪怕在一起很久了，我依然很在意纪念日仪式感或偶尔准备无理由的小惊喜。', couple:'我们在平淡日常里也会刻意制造小浪漫，比如突如其来的小礼物或约会夜。', soloRoast:'生活已经够像上班了，恋爱就别再过成例行公事了。', coupleRoast:'哪怕是一束路边十块钱的花，也能把普通周三变成纪念日。' },
+      { axis:5, dir:1, follow:false, solo:'我喜欢和伴侣一起解锁没去过的新店、临时起意夜游，或者做点幼稚好玩的事。', couple:'我们经常一起尝试新鲜体验、搞怪拍照或来一场说走就走的短途兜风。', soloRoast:'能陪你一起犯傻的人，比只会讲大道理的人稀缺多了。', coupleRoast:'保持对彼此的好奇心，是爱情防老化的最强防腐剂。' }
+    ];
+
+    const LEVELS = [
+      { label:'非常符合', score:2 }, { label:'比较符合', score:1 }, { label:'看情况', score:0 },
+      { label:'不太符合', score:-1 }, { label:'非常不符合', score:-2 }
+    ];
+
+    const REPORT = {
+      group:'高稳质感组', title:'六边形恋人', pairTitle:'满级搭档', code:'RBFK',
+      oneLiner:'接得住情绪、守得住边界、吵完当天清零、答应的事件件落地。',
+      pairOneLiner:'同频共振又彼此留白，有矛盾当场修、有约定稳稳兑现。',
+      traitIntro:'你在关系里兼具共情力与执行力：对方难过时你先给拥抱再给方案，需要空间时你痛快放行，出现分歧不翻旧账，承诺过的小事也从不放鸽子。',
+      axisSummary:[
+        { key:'resp', posCode:'R', posLabel:'共情接频', negLabel:'问题排障', negCode:'M', letter:'R', pct:79, color:'#33A474', split:false },
+        { key:'bound', posCode:'B', posLabel:'留白透气', negLabel:'介入操心', negCode:'P', letter:'B', pct:75, color:'#4298B4', split:false },
+        { key:'repair', posCode:'F', posLabel:'当场清零', negLabel:'体面冷存', negCode:'H', letter:'F', pct:83, color:'#88619A', split:false },
+        { key:'commit', posCode:'K', posLabel:'落地有声', negLabel:'弹性改签', negCode:'D', letter:'K', pct:88, color:'#E4AE3A', split:false }
+      ],
+      subTraits:[
+        { name:'情绪优先倾听', score:81, color:'#33A474' }, { name:'先问需求再支招', score:76, color:'#33A474' },
+        { name:'尊重独处边界', score:84, color:'#4298B4' }, { name:'克制过度介入', score:72, color:'#4298B4' },
+        { name:'冲突及时复盘', score:86, color:'#88619A' }, { name:'不翻历史旧账', score:79, color:'#88619A' },
+        { name:'约定准点履约', score:90, color:'#E4AE3A' }, { name:'变动提前同步', score:85, color:'#E4AE3A' }
+      ],
+      plainTraits:[
+        { title:'回应模式', text:'你习惯先接住情绪再给方案，很少让对方觉得「没被听见」。' },
+        { title:'边界方式', text:'你能给彼此留白，也不把关心变成全天候微管理。' },
+        { title:'修复速度', text:'出现摩擦时你倾向当天聊开，不把情绪拖成隔夜账。' },
+        { title:'兑现可靠', text:'答应过的小事基本都有着落，是关系里稳定的信任来源。' }
+      ],
+      sixNeeds:[
+        { key:'material', name:'物质现实', score:78, color:'#33A474', desc:'重视共同储蓄与抗风险规划，把现实账算清才踏实。' },
+        { key:'romance', name:'浪漫新鲜感', score:71, color:'#4298B4', desc:'在意仪式感，也愿意偶尔制造无理由的小惊喜。' },
+        { key:'respect', name:'尊重与边界', score:88, color:'#88619A', desc:'给彼此独处空间，不把关心过成控制。' },
+        { key:'response', name:'情绪回应', score:84, color:'#E4AE3A', desc:'能较快捕捉对方情绪，并给出稳定回应。' },
+        { key:'repair', name:'冲突修复', score:82, color:'#B85D6F', desc:'愿意主动复盘，把矛盾留在当天解决。' },
+        { key:'trust', name:'承诺兑现', score:90, color:'#1E7E56', desc:'约定基本准点落地，变动会提前同步。' }
+      ],
+      pros:'情绪托底稳、边界清爽、冲突不隔夜、兑现率极高。',
+      cons:'偶尔因为太体面靠谱，容易把委屈先自己消化，忘记主动示弱求助。',
+      matches:[
+        { code:'RBFK', title:'六边形恋人', tag:'同频顶配', reason:'你们都具备高共情、清晰边界与强兑现力，相处几乎零内耗，能把日常过成高质量双向奔赴。' },
+        { code:'MBFK', title:'钢铁直球', tag:'稳健互补', reason:'你的细腻共情能软化对方的直线条，对方的硬核执行力也能稳稳托住你的生活细节。' }
+      ],
+      plan:'每周留 15 分钟「不讲道理只撒娇」时间，允许自己偶尔不那么完美。'
+    };
+
+    const viewport = document.getElementById('viewport');
+    const phone = document.getElementById('phone');
+    const quizState = { mode:'solo', roomCode:'', seat:'A', currentIndex:0, rawAnswers:new Array(16).fill(null), sourceStep:false };
+    let reportMode = 'solo';
+    let roomState = { code:'', seat:'A', aSubmitted:false, bSubmitted:false };
+
+    function esc(text) {
+      return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function toast(message) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = message;
+      phone.appendChild(el);
+      setTimeout(() => el.remove(), 1800);
+    }
+
+    function show(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.go === name));
+      const titles = { home:'CPTI 恋爱人格测验', quiz:quizState.mode === 'pair' ? '双人盲答 · 席位 ' + quizState.seat : '单人恋爱人格测评', room:'双人盲答房间', report:'CPTI 测评报告' };
+      document.getElementById('navTitle').textContent = titles[name];
+      viewport.scrollTop = 0;
+      if (name === 'quiz') renderQuiz();
+      if (name === 'room') renderRoom();
+      if (name === 'report') renderReport();
+    }
+
+    function renderHome() {
+      const html = `
+        <div class="hero">
+          <div class="pill">CPTI · COUPLE PERSONALITY TYPE INDICATOR</div>
+          <h2>测清你们在亲密关系里的真实角色</h2>
+          <p>12–16 题快速拆解回应、边界、修复与兑现四维倾向，同步生成六维需求解析。</p>
+          <div class="hero-art"><b>CPTI</b><span>home_hero.png 未提供，当前显示占位</span></div>
+        </div>
+        <div class="card entry" onclick="startQuiz('solo')">
+          <div class="entry-left">
+            <span class="tag tag-green">单人深度测评 · 约 2 分钟</span>
+            <div class="entry-title">测我在关系里的角色</div>
+            <div class="entry-desc">锁定你的专属四位代码、角色画像、六维需求排序与最佳适配伴侣。</div>
+          </div>
+          <div class="entry-badge badge-green">我</div>
+        </div>
+        <div class="card entry" onclick="startQuiz('pair')">
+          <div class="entry-left">
+            <span class="tag tag-blue">双人独立盲答 · 微信好友直连</span>
+            <div class="entry-title">测我们是哪种情侣</div>
+            <div class="entry-desc">各自独立作答互不偷看，双方交卷后同步揭晓双人合盘称号与六维温差。</div>
+          </div>
+          <div class="entry-badge badge-blue">TA</div>
+        </div>
+        <div class="theory">
+          <b>理论与测量参考</b>
+          <p>维度设计参考感知伴侣回应性、健康心理边界理论、戈特曼冲突修复尝试模型及行为微信任机制。本测评用于亲密互动风格探索与自我觉察，不构成临床心理诊断。</p>
+        </div>`;
+      document.getElementById('screen-home').innerHTML = html;
+    }
+
+    function normalizeAnswer(value) {
+      if (value === null || value === undefined || value === 'UNASKED') return null;
+      if (value === 'SKIP') return 'SKIP';
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+    function shouldAsk(index) {
+      const q = QUESTIONS[index];
+      if (!q) return false;
+      if (!q.follow) return true;
+      const base = q.axis * 3;
+      const v1 = normalizeAnswer(quizState.rawAnswers[base]);
+      const v2 = normalizeAnswer(quizState.rawAnswers[base + 1]);
+      if (v1 === null || v2 === null) return true;
+      if (v1 === 'SKIP' || v2 === 'SKIP' || v1 === 0 || v2 === 0) return true;
+      const s1 = v1 * QUESTIONS[base].dir;
+      const s2 = v2 * QUESTIONS[base + 1].dir;
+      return !((s1 > 0 && s2 > 0) || (s1 < 0 && s2 < 0));
+    }
+    function nextIndex(current) {
+      for (let i = current + 1; i < QUESTIONS.length; i++) if (shouldAsk(i)) return i;
+      return -1;
+    }
+    function prevIndex(current) {
+      for (let i = current - 1; i >= 0; i--) if (shouldAsk(i)) return i;
+      return -1;
+    }
+    function visibleProgress(current) {
+      let total = 0, position = 1;
+      for (let i = 0; i < QUESTIONS.length; i++) {
+        if (shouldAsk(i)) { total++; if (i === current) position = total; }
+      }
+      return { current:position, total:Math.max(total,1) };
+    }
+    function axisInfo(axis) {
+      if (axis <= 3) return { tag:AXIS_META[axis].name + ' · ' + AXIS_META[axis].posCode + '/' + AXIS_META[axis].negCode, color:AXIS_META[axis].color, bg:AXIS_META[axis].bg };
+      if (axis === 4) return { tag:'需求 · 物质现实', color:'#4298B4', bg:'#EAF5F8' };
+      return { tag:'需求 · 浪漫新鲜感', color:'#B85D6F', bg:'#FCEEF1' };
+    }
+
+    function renderQuiz() {
+      const card = document.getElementById('quizCard');
+      if (quizState.sourceStep) {
+        document.getElementById('axisTag').textContent = '最后一步';
+        document.getElementById('axisTag').style.cssText = 'background:#E8F6F0;color:#33A474';
+        document.getElementById('progressNum').textContent = '最后一步';
+        document.getElementById('progressFill').style.cssText = 'width:100%;background:#33A474';
+        card.innerHTML = `
+          <div class="question">你刚才的回答，主要基于哪种情况？</div>
+          <div class="roast" style="border-left-color:#33A474"><span class="roast-badge" style="background:#33A474">说明</span><span class="roast-text">凭想象作答会为你标注「恋爱预演」，帮助你更客观地参考结果。</span></div>
+          <div class="options">
+            <div class="option" onclick="finishQuiz('real')"><span class="dot"></span><span class="option-label">真实恋爱 / 暧昧相处经历</span></div>
+            <div class="option" onclick="finishQuiz('imagination')"><span class="dot"></span><span class="option-label">目前单身，凭想象中的相处作答</span></div>
+          </div>
+          <div class="row"><button class="btn" onclick="backFromSource()">← 返回最后一题</button></div>`;
+        return;
+      }
+
+      const q = QUESTIONS[quizState.currentIndex];
+      const info = axisInfo(q.axis);
+      const prog = visibleProgress(quizState.currentIndex);
+      const isPair = quizState.mode === 'pair';
+      document.getElementById('axisTag').textContent = info.tag;
+      document.getElementById('axisTag').style.cssText = 'background:' + info.bg + ';color:' + info.color;
+      document.getElementById('progressNum').textContent = '第 ' + prog.current + ' / ' + prog.total + ' 题';
+      document.getElementById('progressFill').style.cssText = 'width:' + Math.round(prog.current / prog.total * 100) + '%;background:' + info.color;
+
+      const options = LEVELS.map(item => {
+        const selected = quizState.rawAnswers[quizState.currentIndex] === item.score;
+        return `<div class="option" onclick="selectOption(${item.score})" style="${selected ? 'border-color:' + info.color + ';background:' + info.bg : ''}">
+          <span class="dot" style="${selected ? 'background:' + info.color + ';border-color:' + info.color : ''}"></span>
+          <span class="option-label">${item.label}</span></div>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="question">${esc(isPair ? q.couple : q.solo)}</div>
+        <div class="roast" style="border-left-color:${info.color}"><span class="roast-badge" style="background:${info.color}">吐槽</span><span class="roast-text">${esc(isPair ? q.coupleRoast : q.soloRoast)}</span></div>
+        <div class="options">${options}</div>
+        <div class="row">
+          ${prevIndex(quizState.currentIndex) !== -1 ? '<button class="btn" onclick="goPrev()">← 上一题</button>' : ''}
+          <button class="btn" onclick="skipQuestion()">没遇过 / 跳过</button>
+        </div>`;
+    }
+
+    function startQuiz(mode) {
+      quizState.mode = mode;
+      quizState.roomCode = mode === 'pair' ? roomState.code : '';
+      quizState.seat = mode === 'pair' ? roomState.seat : 'A';
+      quizState.currentIndex = 0;
+      quizState.rawAnswers = new Array(16).fill(null);
+      quizState.sourceStep = false;
+      show('quiz');
+    }
+    function selectOption(score) {
+      const current = quizState.currentIndex;
+      quizState.rawAnswers[current] = score;
+      for (let i = current + 1; i < QUESTIONS.length; i++) if (QUESTIONS[i].follow) quizState.rawAnswers[i] = null;
+      const next = nextIndex(current);
+      if (next !== -1) { quizState.currentIndex = next; renderQuiz(); }
+      else finishFlow();
+    }
+    function skipQuestion() { selectOption('SKIP'); }
+    function goPrev() {
+      const prev = prevIndex(quizState.currentIndex);
+      if (prev !== -1) { quizState.currentIndex = prev; renderQuiz(); }
+    }
+    function finishFlow() {
+      if (quizState.mode === 'solo') { quizState.sourceStep = true; renderQuiz(); }
+      else { roomState.seat === 'A' ? roomState.aSubmitted = true : roomState.bSubmitted = true; showReport('pair'); }
+    }
+    function backFromSource() { quizState.sourceStep = false; renderQuiz(); }
+    function finishQuiz(source) { showReport('solo'); }
+
+    function randomCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let result = '';
+      for (let i = 0; i < 6; i++) result += chars[Math.floor(Math.random() * chars.length)];
+      return result;
+    }
+    function createRoom() {
+      roomState = { code:randomCode(), seat:'A', aSubmitted:false, bSubmitted:false };
+      renderRoom();
+      toast('房间已创建');
+    }
+    function joinRoom() {
+      const input = document.getElementById('codeInput');
+      const code = (input ? input.value : '').trim().toUpperCase();
+      if (code.length !== 6) { toast('请输入 6 位房间码'); return; }
+      roomState = { code:code, seat:'B', aSubmitted:true, bSubmitted:false };
+      renderRoom();
+    }
+    function renderRoom() {
+      const content = document.getElementById('roomContent');
+      if (!roomState.code) {
+        content.innerHTML = `
+          <div class="card">
+            <div class="section-title">发起双人盲答</div>
+            <p class="room-desc">创建一个专属 6 位房间码，转发给伴侣。双方独立作答、互不偷看，交卷后自动生成双人合盘报告。</p>
+            <button class="btn btn-green btn-block" onclick="createRoom()">创建双人房间</button>
+          </div>
+          <div class="card">
+            <div class="section-title">输入好友房间码加入</div>
+            <input id="codeInput" class="code-input" maxlength="6" placeholder="输入 6 位房间码（如 A8K2M9）" />
+            <button class="btn btn-blue btn-block" onclick="joinRoom()">进入房间并作答</button>
+          </div>`;
+        return;
+      }
+      const bothReady = roomState.aSubmitted && roomState.bSubmitted;
+      const mySubmitted = roomState.seat === 'A' ? roomState.aSubmitted : roomState.bSubmitted;
+      const title = bothReady ? '双方均已交卷，报告已就绪！' : (mySubmitted ? '你已交卷，正在等伴侣完成...' : '请先完成你的独立盲答');
+      content.innerHTML = `
+        <div class="card" style="text-align:center;padding:18px 16px">
+          <span class="room-badge" onclick="copyCode()">房间号 · ${roomState.code}（点击复制）</span>
+          <div class="room-title">${title}</div>
+          ${mySubmitted && !bothReady ? '<div class="waiting">保持当前页面或随时回来，伴侣一交卷将自动为你揭晓合盘结果。</div>' : ''}
+          <div class="seats">
+            <div class="seat ${roomState.aSubmitted ? 'done' : ''}"><div class="seat-name">发起方（席位 A）${roomState.seat === 'A' ? '· 我' : ''}</div><div class="seat-state">${roomState.aSubmitted ? '✓ 已交卷' : '作答中...'}</div></div>
+            <div class="seat ${roomState.bSubmitted ? 'done' : ''}"><div class="seat-name">受邀方（席位 B）${roomState.seat === 'B' ? '· 我' : ''}</div><div class="seat-state">${roomState.bSubmitted ? '✓ 已交卷' : '等待加入/作答'}</div></div>
+          </div>
+          ${!bothReady ? '<button class="btn btn-green btn-block" onclick="toast(\'预览环境无法调用微信分享\')">转发微信好友邀请对方作答</button>' : ''}
+          ${!mySubmitted ? `<button class="btn btn-blue btn-block" onclick="startQuiz('pair')">开始我的盲答（席位 ${roomState.seat}）</button>` : ''}
+          ${!bothReady ? '<button class="btn btn-block" onclick="simulatePartner()">模拟伴侣交卷（仅预览）</button>' : ''}
+          ${bothReady ? '<button class="btn btn-green btn-block" onclick="showReport(\'pair\')">立即揭晓双人合盘报告</button>' : ''}
+          <button class="btn btn-block" onclick="resetRoom()">退出当前房间</button>
+        </div>`;
+    }
+    function copyCode() {
+      if (navigator.clipboard) navigator.clipboard.writeText(roomState.code).then(() => toast('房间号已复制'));
+      else toast('房间号：' + roomState.code);
+    }
+    function simulatePartner() {
+      if (roomState.seat === 'A') roomState.bSubmitted = true; else roomState.aSubmitted = true;
+      renderRoom();
+      toast('伴侣已交卷');
+    }
+    function resetRoom() { roomState = { code:'', seat:'A', aSubmitted:false, bSubmitted:false }; renderRoom(); }
+
+    function showReport(mode) { reportMode = mode; show('report'); }
+    function renderReport() {
+      const isPair = reportMode === 'pair';
+      const img = 'miniprogram/assets/' + (isPair ? 'pair_' : 'solo_') + REPORT.code + '.png';
+      const axisRows = REPORT.axisSummary.map(item => `
+        <div class="axis-row">
+          <div class="axis-labels">
+            <span class="${item.letter === item.posCode ? 'axis-active' : ''}">${item.posCode} · ${item.posLabel}</span>
+            <span class="axis-pct">${item.pct}%</span>
+            <span class="${item.letter === item.negCode ? 'axis-active' : ''}">${item.negLabel} · ${item.negCode}</span>
+          </div>
+          <div class="track"><div class="fill" style="width:${item.pct}%;background:${item.color}"></div></div>
+        </div>`).join('');
+      const subTraits = REPORT.subTraits.map(item => `
+        <div class="grid-item">
+          <div class="grid-top"><span class="grid-name">${item.name}</span><span style="color:${item.color};font-weight:800">${item.score}%</span></div>
+          <div class="mini-track"><div class="fill" style="width:${item.score}%;background:${item.color}"></div></div>
+        </div>`).join('');
+      const plain = REPORT.plainTraits.map(item => `<p><strong>${item.title}：</strong>${item.text}</p>`).join('');
+      const needs = REPORT.sixNeeds.map(item => `
+        <div class="need">
+          <div class="need-head"><div class="need-left"><span class="need-dot" style="background:${item.color}"></span><span class="need-name">${item.name}</span>${item.gap ? '<span class="gap">双方有温差</span>' : ''}</div><span class="need-score" style="color:${item.color}">${item.score} / 100</span></div>
+          <div class="track"><div class="fill" style="width:${item.score}%;background:${item.color}"></div></div>
+          <div class="need-desc">${item.desc}</div>
+        </div>`).join('');
+      const matches = REPORT.matches.map(item => `
+        <div class="match"><div class="match-top"><div><span class="match-title">${item.title}</span><span class="match-code">${item.code}</span></div><span class="match-tag">${item.tag}</span></div><div class="match-reason"><strong>适配原因：</strong>${item.reason}</div></div>`).join('');
+      document.getElementById('reportContent').innerHTML = `
+        <div class="card poster">
+          <span class="poster-group">${REPORT.group}</span>
+          <div class="poster-title">${isPair ? REPORT.pairTitle : REPORT.title}</div>
+          <div class="poster-code">${REPORT.code}</div>
+          <img class="poster-art" src="${img}" alt="${REPORT.code}" />
+          <div class="poster-oneliner">${isPair ? REPORT.pairOneLiner : REPORT.oneLiner}</div>
+        </div>
+        <div class="card">
+          <div class="section-title">① 人格特征</div>
+          <div class="intro">${esc(isPair ? '你们拥有极高成熟度的亲密协作系统：情绪上互相托底，生活上各自独立，遇到摩擦能就事论事快速翻篇。' : REPORT.traitIntro)}</div>
+          <div class="sub-title">四维行为倾向</div>
+          ${axisRows}
+          <div class="sub-title">八维细分特质曲线</div>
+          <div class="grid">${subTraits}</div>
+          <div class="plain"><b>四维特征解读</b>${plain}</div>
+        </div>
+        <div class="card">
+          <div class="section-title">② 六维需求解析</div>
+          ${needs}
+        </div>
+        <div class="card">
+          <div class="section-title">③ 内在优势与典型短板</div>
+          <div class="sw pros"><span class="sw-tag green">核心优势</span><span class="sw-sub">关系里最加分的底牌</span><div class="sw-text">${REPORT.pros}</div></div>
+          <div class="sw cons"><span class="sw-tag rose">典型短板</span><span class="sw-sub">压力下最容易踩的坑</span><div class="sw-text">${REPORT.cons}</div></div>
+        </div>
+        ${!isPair ? `<div class="card"><div class="section-title">④ 适配伴侣类型</div>${matches}</div>` : ''}
+        <div class="card">
+          <div class="section-title">${isPair ? '④' : '⑤'} 最小可执行改进计划</div>
+          <div class="plan">${REPORT.plan}</div>
+        </div>
+        <button class="btn btn-green btn-block" onclick="toast('预览环境无法调用微信分享')">分享报告给微信好友</button>
+        <button class="btn btn-block" onclick="startQuiz('${isPair ? 'pair' : 'solo'}')">${isPair ? '再开一局双人盲答' : '重新测一遍'}</button>
+        <button class="btn btn-block" onclick="show('home')">返回首页</button>
+        <div class="theory" style="margin-top:12px"><p>理论参考：感知伴侣回应性（PPR）、健康边界理论、戈特曼修复尝试模型与微信任机制（Micro-trust）。结果仅供亲密关系探索参考，不构成专业医疗或心理诊断。</p></div>`;
+    }
+
+    document.querySelectorAll('.tab').forEach(button => {
+      button.addEventListener('click', () => show(button.dataset.go));
+    });
+    document.getElementById('navBack').addEventListener('click', () => show('home'));
+
+    renderHome();
+    const initialScreen = new URLSearchParams(window.location.search).get('screen');
+    show(['home','quiz','room','report'].includes(initialScreen) ? initialScreen : 'home');
+  </script>
+</body>
+</html>
